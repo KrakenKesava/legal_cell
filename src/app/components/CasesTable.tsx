@@ -1,38 +1,77 @@
-import CaseRow from "./CaseRow";
+"use client";
+import { CaseType } from "@/types/case";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 
-export default function CasesTable() {
-  const mock = [
-    {
-      date: "2025-01-30",
-      caseNo: "OA-123",
-      recipient: "John Doe",
-      court: "High Court",
-      status: "Open",
-    }
-  ];
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+
+import CaseDetailsModal from "./CaseDetailsModal";
+
+export default function CasesTable({ rows }: { rows: CaseType[] }) {
+  const [selectedCase, setSelectedCase] = useState<CaseType | null>(null);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+    <>
+      {/* Modal */}
+      <CaseDetailsModal
+        open={!!selectedCase}
+        onClose={() => setSelectedCase(null)}
+        data={selectedCase}
+      />
 
-      <table className="w-full text-left border-collapse text-sm">
-        <thead className="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th className="p-3 font-semibold">Date Filing</th>
-            <th className="p-3 font-semibold">Case No</th>
-            <th className="p-3 font-semibold">Recipient</th>
-            <th className="p-3 font-semibold">Court</th>
-            <th className="p-3 font-semibold">Status</th>
-            <th className="p-3 font-semibold text-center">Action</th>
-          </tr>
-        </thead>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date Filing</TableHead>
+            <TableHead>Case No</TableHead>
+            <TableHead>Applicant</TableHead>
+            <TableHead>Court</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-center">Action</TableHead>
+          </TableRow>
+        </TableHeader>
 
-        <tbody>
-          {mock.map((c, i) => (
-            <CaseRow key={i} data={c} />
+        <TableBody>
+          {rows.map((c: CaseType, idx: number) => (
+            <TableRow key={idx}>
+              <TableCell>{c.dateOfFiling?.slice(0, 10)}</TableCell>
+              <TableCell>{c.caseNo}</TableCell>
+              <TableCell>{c.applicants[0]}</TableCell>
+              <TableCell>{c.court}</TableCell>
+
+              <TableCell>
+                <Badge
+                  variant={
+                    c.presentStatus === "Pending" ? "secondary" : "default"
+                  }
+                >
+                  {c.presentStatus}
+                </Badge>
+              </TableCell>
+
+              <TableCell className="flex gap-2 justify-center">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSelectedCase(c)}
+                >
+                  View
+                </Button>
+
+                <Button size="sm">Edit</Button>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-
-    </div>
+        </TableBody>
+      </Table>
+    </>
   );
 }
