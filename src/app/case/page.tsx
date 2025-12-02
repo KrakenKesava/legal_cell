@@ -12,19 +12,19 @@ export default function CasePage() {
   const [allCases, setAllCases] = useState<any[]>([]);
   const [filteredCases, setFilteredCases] = useState<any[]>([]);
 
-  // Fetch all cases from backend
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await axios.get("/api/cases");
-        console.log("Loaded cases:", res.data);
-        setAllCases(res.data);
-        setFilteredCases(res.data);
-      } catch (err) {
-        console.error("Failed to load cases:", err);
-      }
+  // 🔥 Fetch all cases
+  const loadCases = async () => {
+    try {
+      const res = await axios.get("/api/cases");
+      setAllCases(res.data);
+      setFilteredCases(res.data);
+    } catch (err) {
+      console.error("Failed to load cases:", err);
     }
-    load();
+  };
+
+  useEffect(() => {
+    loadCases();
   }, []);
 
   // Dynamic filtering logic
@@ -72,8 +72,12 @@ export default function CasePage() {
 
         <div className="grid grid-cols-[280px_1fr] gap-6">
 
-          {/* Left Sidebar Filters */}
-          <Filters onFilterChange={onFilterChange} onClear={clearFilters} />
+          {/* ⬅️ Filters with Add Case Modal */}
+          <Filters 
+            onFilterChange={onFilterChange}
+            onClear={clearFilters}
+            onAdd={loadCases}   // ⭐ IMPORTANT ⭐
+          />
 
           {/* Search + Table */}
           <div className="space-y-4">

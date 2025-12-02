@@ -4,20 +4,22 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
+import AddCaseModal from "./AddCaseModal";
 
-export default function Filters({ onFilterChange, onClear }) {
+export default function Filters({ onFilterChange, onClear, onAdd }) {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [caseType, setCaseType] = useState([]);
   const [status, setStatus] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  // 🔥 Dynamic filtering: Runs automatically on ANY filter change
+  // Run filters dynamically
   useEffect(() => {
     onFilterChange({
       dateFrom,
       dateTo,
       caseType,
-      status
+      status,
     });
   }, [dateFrom, dateTo, caseType, status]);
 
@@ -37,7 +39,17 @@ export default function Filters({ onFilterChange, onClear }) {
   return (
     <Card className="p-4 space-y-4">
 
-      <Button className="w-full">Add Case</Button>
+      {/* Add Case Button */}
+      <Button className="w-full" onClick={() => setShowAddModal(true)}>
+        Add Case
+      </Button>
+
+      {showAddModal && (
+        <AddCaseModal
+          onClose={() => setShowAddModal(false)}
+          onSaved={onAdd}   // 🔥 refresh cases after adding new one
+        />
+      )}
 
       {/* Date Range */}
       <div>
@@ -77,7 +89,7 @@ export default function Filters({ onFilterChange, onClear }) {
 
       <Separator />
 
-      {/* Status Filter */}
+      {/* Case Status */}
       <p className="font-semibold text-sm">Case Status</p>
 
       <div className="space-y-2">
@@ -92,7 +104,7 @@ export default function Filters({ onFilterChange, onClear }) {
         ))}
       </div>
 
-      {/* Optional Clear All link */}
+      {/* Reset Button */}
       <Button variant="outline" onClick={clearAll} className="w-full mt-4">
         Reset Filters
       </Button>

@@ -55,3 +55,39 @@ export async function PUT(req: Request) {
     );
   }
 }
+
+export async function POST(req: Request) {
+  try {
+    await connectDB();
+    const body = await req.json();
+
+    // Validate caseNo exists
+    if (!body.caseNo) {
+      return NextResponse.json(
+        { error: "caseNo is required" },
+        { status: 400 }
+      );
+    }
+
+    // Prevent duplicate case numbers
+    const existing = await Case.findOne({ caseNo: body.caseNo });
+    if (existing) {
+      return NextResponse.json(
+        { error: "Case already exists" },
+        { status: 409 }
+      );
+    }
+
+    // Create a new case
+    const saved = await Case.create(body);
+
+    return NextResponse.json(saved, { status: 201 });
+
+  } catch (err: any) {
+    console.error("POST /api/cases ERROR:", err);
+    return NextResponse.json(
+      { error: "Server error", details: err.message },
+      { status: 500 }
+    );
+  }
+}
